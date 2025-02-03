@@ -1,4 +1,4 @@
-# ASAP
+# ASAP: an Automated Style-Aware Selection of Pre-training Datasets in 2D Biomedical Imaging
 
 ## Description
 This repository contains the code and documentation to implement the system for selection of pre-trained datasets in the biomedical domain described in the paper:
