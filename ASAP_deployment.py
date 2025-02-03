@@ -24,8 +24,6 @@ import seaborn as sns
 import os
 import matplotlib.pyplot as plt
 from scipy.spatial import distance_matrix
-from scipy.stats import spearmanr
-from sklearn.metrics import top_k_accuracy_score
 import pandas as pd
 import sys
 
@@ -603,7 +601,7 @@ class AE_ResNet(nn.Module):
 
         return x, z, gram1_enc, gram2_enc, gram3_enc, gram4_enc, gram1_dec, gram2_dec, gram3_dec, gram4_dec
     
-# Dataset handler and data augmentation
+# Dataset handler and data augmentation  
 def custom_data_augmentation(img,size):
     # Random gamma adjustment
     gamma = 0.1*np.random.randn()+1
@@ -735,7 +733,7 @@ def calculate_distances(x,y):
     
 if __name__ == '__main__':
 
-    # PARAMETERS
+    # Parameters
     eConfig = {'alpha': 0.5,
             'beta':0.6,
             'weight1':0.2,
@@ -758,23 +756,19 @@ if __name__ == '__main__':
     style_weights=[eConfig['weight1'],eConfig['weight2'],eConfig['weight3'],eConfig['weight4']] # gram1, gram2, gram3, gram4
 
         
-    # Data and result options
-    DATASET_FOLDER = 'dataset_train'
-    TEST_FOLDER = 'dataset_test'
-    RESULT_FOLDER = 'results_z_'+str(eConfig['z_dim'])+'_alpha_'+str(eConfig['alpha'])+'_beta_'+str(eConfig['beta'])+'_weights_'+str(eConfig['weight1'])+'_'+str(eConfig['weight2'])+'_'+str(eConfig['weight3'])+'_'+str(eConfig['weight4'])#+'_'+str(np.random.randint(0,1000))
+    # Data and results options
+    DATASET_FOLDER = 'dataset_full'
+    RESULT_FOLDER = 'results_z_'+str(eConfig['z_dim'])+'_deployment'
     extension = '.png'
     input_size = [64,64,3] # [Height, Width, Channels]
     z_dim = eConfig['z_dim']
-    n_train_datasets=9
-    train_dataset_names=['HAM10000'+' ('+r'$D^{a}_1$'+')','MoNuSeg'+' ('+r'$D^{a}_2$'+')','PanNuKe'+' ('+r'$D^{a}_3$'+')','Fluo-N2DL-HeLa'+' ('+r'$D^{a}_4$'+')','Cellpose'+' ('+r'$D^{a}_5$'+')','PhC-C2DH-U373'+' ('+r'$D^{a}_6$'+')','URICADS'+' ('+r'$D^{a}_7$'+')','heartSeg'+' ('+r'$D^{a}_8$'+')','DENTAL'+' ('+r'$D^{a}_9$'+')']
-    n_test_datasets=12
-    test_dataset_names=['ISIC2017'+' ('+r'$D^{na}_1$'+')','CryoNuSeg'+' ('+r'$D^{na}_2$'+')','Fluo-N2DH-GOWT1'+' ('+r'$D^{na}_3$'+')','PhC-C2DL-PSC'+' ('+r'$D^{na}_4$'+')','LUMINOUS'+' ('+r'$D^{na}_5$'+')','Fluo-C2DL-Huh7'+' ('+r'$D^{na}_6$'+')','DIC-C2DH-HeLa'+' ('+r'$D^{na}_7$'+')','LIVECell'+' ('+r'$D^{na}_8$'+')','CVC-ClinicDB'+' ('+r'$D^{na}_9$'+')','USNerve'+' ('+r'$D^{na}_{10}$'+')','RIGA'+' ('+r'$D^{na}_{11}$'+')','LUNG'+' ('+r'$D^{na}_{12}$'+')']#'VOC2012','COCO',
+    n_train_datasets=21
+    train_dataset_names=['HAM10000'+' ('+r'$D^{a}_1$'+')','MoNuSeg'+' ('+r'$D^{a}_2$'+')','PanNuKe'+' ('+r'$D^{a}_3$'+')','Fluo-N2DL-HeLa'+' ('+r'$D^{a}_4$'+')','Cellpose'+' ('+r'$D^{a}_5$'+')','PhC-C2DH-U373'+' ('+r'$D^{a}_6$'+')','URICADS'+' ('+r'$D^{a}_7$'+')','heartSeg'+' ('+r'$D^{a}_8$'+')','DENTAL'+' ('+r'$D^{a}_9$'+')','ISIC2017'+' ('+r'$D^{na}_1$'+')','CryoNuSeg'+' ('+r'$D^{na}_2$'+')','Fluo-N2DH-GOWT1'+' ('+r'$D^{na}_3$'+')','PhC-C2DL-PSC'+' ('+r'$D^{na}_4$'+')','LUMINOUS'+' ('+r'$D^{na}_5$'+')','Fluo-C2DL-Huh7'+' ('+r'$D^{na}_6$'+')','DIC-C2DH-HeLa'+' ('+r'$D^{na}_7$'+')','LIVECell'+' ('+r'$D^{na}_8$'+')','CVC-ClinicDB'+' ('+r'$D^{na}_9$'+')','USNerve'+' ('+r'$D^{na}_{10}$'+')','RIGA'+' ('+r'$D^{na}_{11}$'+')','LUNG'+' ('+r'$D^{na}_{12}$'+')']
     dataset_names=train_dataset_names.copy()
-    dataset_names.extend(test_dataset_names)
     if not os.path.exists(RESULT_FOLDER):
         os.mkdir(RESULT_FOLDER)
     # Load the segmentation results
-    results_test=pd.read_csv('results_test.csv',decimal=',',header=None)
+    results_test=pd.read_csv('results_full.csv',decimal=',',header=None)
     results_test=results_test.to_numpy().astype('float32')
      
     # Plot options
@@ -782,8 +776,8 @@ if __name__ == '__main__':
     sns.set_style("whitegrid")    
     POINT_SIZE=60
     ALPHA=1
-    palette = sns.color_palette("bright", n_train_datasets)
-    palette_test = sns.color_palette(np.concatenate((palette,sns.color_palette("pastel", n_train_datasets),sns.color_palette("dark", int(n_test_datasets-n_train_datasets))),axis=0))
+    palette = sns.color_palette("bright", 9)
+    palette_test = sns.color_palette(np.concatenate((palette,sns.color_palette("pastel", 9),sns.color_palette("dark", 3)),axis=0))
     
     # Training options
     batch_size = 8
@@ -796,14 +790,13 @@ if __name__ == '__main__':
     criterion=torch.nn.MSELoss()
     
     # Training AE with triplet loss
-    
     epoch_loss=np.zeros((n_epochs,),dtype='float')
     best_loss=float('inf')
     best_model=[]
     triplet=torch.nn.TripletMarginLoss()
     
-    # Load the pretrained model 
-    model = AE_ResNet(z_dim) 
+    # Load the pretrained model
+    model = AE_ResNet(z_dim)
     pretrained = torch.load('caltech256-resnet18.pth')
     print('Pretrained model loaded')
     model_dict = model.state_dict()
@@ -813,6 +806,7 @@ if __name__ == '__main__':
     model.load_state_dict(model_dict)
     print('Model dict loaded')
 
+    
     # Detect if we have a GPU available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cu")
     
@@ -908,158 +902,31 @@ if __name__ == '__main__':
         _, outputs_aux, _, _, _, _, _, _, _, _  = model(images)
         outputs[i,:]=outputs_aux.detach().cpu().numpy()
         dataset_ids[i]=dset_id.cpu().numpy()
-        
     # Graphical representation
     if (z_dim==2):
         # Graphical representation
         sns_plot = sns.scatterplot(x=outputs[:, 0], y=outputs[:, 1], hue=dataset_ids.ravel(), s=POINT_SIZE,
-                                        legend='full', alpha=ALPHA, palette=palette)
+                                        legend='full', alpha=ALPHA, palette=palette_test)
     else:
         print('Implement your favourite dimensionality reduction algorithm: TSNE, UMAP, ...')
 
+    plt.xlim([-6,10.5])
+    sns_plot.set_xlabel(r'$z_1$',fontsize='18')
+    sns_plot.set_ylabel(r'$z_2$',fontsize='18')
     new_labels = []
     for i in range(0, n_train_datasets):
         # replace labels
         new_labels.append(train_dataset_names[i])
-    for t, l in zip(sns_plot.get_legend().texts, new_labels):  t.set_text(l)
-    sns_plot.figure.savefig(os.path.join(RESULT_FOLDER, 'triplet_style_embedding.png'),dpi=600)
-    plt.clf()
-    
-    # Embed the test datasets
-    dataset_test = CustomDatasetTriplet(TEST_FOLDER,extension,input_size,augm=False)
-    
-    # define data_loader with batch size 1
-    data_loader_test = torch.utils.data.DataLoader(
-        dataset_test, batch_size=1, shuffle=False, num_workers=0,
-        collate_fn=None)
-    
-    model.eval()
-    outputs_test=np.zeros((len(data_loader_test),z_dim),dtype='float')
-    dataset_ids_test=np.zeros((len(data_loader_test),),dtype='float')
-    
-    # Test the train embedding
-    for i, (data, data_pos, data_neg,dset_id) in enumerate(data_loader_test):
-        images, images_pos, images_neg = data, data_pos, data_neg
-        images, images_pos, images_neg = images.to(device), images_pos.to(device), images_neg.to(device)
-        _, outputs_aux, _, _, _, _, _, _, _, _  = model(images)
-        outputs_test[i,:]=outputs_aux.detach().cpu().numpy()
-        dataset_ids_test[i]=dset_id.cpu().numpy()
-     
-    # Graphical representation
-    if (z_dim==2):
-        sns_plot = sns.scatterplot(x=np.concatenate((outputs[:, 0],outputs_test[:,0]),axis=0), y=np.concatenate((outputs[:, 1],outputs_test[:,1]),axis=0), 
-                               hue=np.concatenate((dataset_ids.ravel(),dataset_ids_test.ravel()),axis=0), style=np.concatenate((dataset_ids.ravel(),dataset_ids_test.ravel()),axis=0),markers=['o' if i<n_train_datasets else 'X' for i in range(n_train_datasets+n_test_datasets)], s=POINT_SIZE, alpha=ALPHA, palette=palette_test)
-    else:
-        print('Implement your favourite dimensionality reduction algorithm: TSNE, UMAP, ...')
-
-    plt.xlim([-6,9.5])
-    sns_plot.set_xlabel(r'$z_1$',fontsize=18)
-    sns_plot.set_ylabel(r'$z_2$',fontsize=18)
-    new_labels = []
-    for i in range(0, n_train_datasets):
-        # replace labels
-        new_labels.append(train_dataset_names[i])
-    for i in range(n_test_datasets):
-        # replace labels
-        new_labels.append(test_dataset_names[i])
     for t, l in zip(sns_plot.get_legend().texts, new_labels):  t.set_text(l)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
     plt.setp(sns_plot.get_legend().get_texts(), fontsize='14')
     plt.tight_layout()
-    sns_plot.figure.savefig(os.path.join(RESULT_FOLDER, 'triplet_style_embedding_test.png'),dpi=600)
-    plt.clf()
-    
-    # Calculate the performance measurements
-    mean_matrix, min_matrix, max_matrix, EQC = calculate_distances(np.concatenate((outputs,outputs_test),axis=0),np.concatenate((dataset_ids.ravel(),dataset_ids_test.ravel()),axis=0))
-    EQC_full=np.mean(np.max(EQC[:n_train_datasets,:n_train_datasets]*np.triu(np.ones((n_train_datasets,n_train_datasets),dtype='float'),k=0),axis=0))
-    print('The EQC for the AE embedding is '+str(EQC_full))
-    corr_mean_triplet=np.zeros((n_test_datasets,),dtype='float')
-    corr_mean_spearman=np.zeros((n_test_datasets,),dtype='float')
-    y_true=np.zeros((n_test_datasets,),dtype='float')
-    rank_mean=np.zeros((n_test_datasets,),dtype='float')
-    loss_mean=np.zeros((n_test_datasets,),dtype='float')
-    
-    for i in range(n_test_datasets):  
-        corr_mean_triplet[i] = np.corrcoef(-mean_matrix[:n_train_datasets,n_train_datasets+i],results_test[:,i])[0,1]
-        corr_mean_spearman[i]=spearmanr(-mean_matrix[:n_train_datasets,n_train_datasets+i],results_test[:,i])[0]
-    
-        y_true[i]=np.argmax(results_test[:,i])
-        rank_mean[i]=np.where(np.argsort(mean_matrix[:n_train_datasets,n_train_datasets+i])==y_true[i])[0]
-        y_pred=np.argsort(mean_matrix[:n_train_datasets,n_train_datasets+i])[0]
-        loss_mean[i]=results_test[y_pred,i]-results_test[int(y_true[i]),i]
-    
-    print('-----------------PERFORMANCE MEASUREMENTS------------')
-    
-    print('The mean correlation for the AE embedding is '+str(np.mean(corr_mean_triplet)))
-    print('The correlation for the AE embedding is '+str(corr_mean_triplet))
-    print('The mean rank correlation index (RCI) for the AE embedding is '+str(np.mean(corr_mean_spearman)))
-    print('The rank correlation index (RCI) for the AE embedding is '+str(corr_mean_spearman))
-    print('The DSC loss for the AE embedding is '+str(np.mean(loss_mean)))
-    top1_mean_triplet=top_k_accuracy_score(y_true, -mean_matrix[:n_train_datasets,n_train_datasets:].T, k=1, labels=np.arange(n_train_datasets))
-    top2_mean_triplet=top_k_accuracy_score(y_true, -mean_matrix[:n_train_datasets,n_train_datasets:].T, k=2, labels=np.arange(n_train_datasets))
-    top3_mean_triplet=top_k_accuracy_score(y_true, -mean_matrix[:n_train_datasets,n_train_datasets:].T, k=3, labels=np.arange(n_train_datasets))
-    
-    print('The top1 accuracy for the AE embedding is '+str(top1_mean_triplet))
-    print('The top2 accuracy for the AE embedding is '+str(top2_mean_triplet))
-    print('The top3 accuracy for the AE embedding is '+str(top3_mean_triplet))
-    print('The ranking for the selected databases in the results is: ')
-    for i in range(n_test_datasets):
-        print(test_dataset_names[i] + ': '+str(rank_mean[i]))
-    
-    mean_matrix = pd.DataFrame(mean_matrix,columns=dataset_names,index=dataset_names).round(2)
-    sns.heatmap(mean_matrix.iloc[:n_train_datasets,n_train_datasets:], annot=True, vmax=mean_matrix.max().max(), vmin=0, cmap='Blues')
-    plt.savefig(os.path.join(RESULT_FOLDER, 'triplet_style_mean_distances.png'),bbox_inches='tight', dpi=600)
+    sns_plot.figure.savefig(os.path.join(RESULT_FOLDER, 'triplet_style_embedding.png'),dpi=600)
     plt.clf()
 
-    # Embed the coherence samples
-    palette_coh = sns.color_palette(np.concatenate((palette,sns.color_palette("pastel", n_train_datasets),sns.color_palette("dark",2)),axis=0))
-    palette_coh.pop(1+n_train_datasets)
-    dataset_coh = CustomDatasetTriplet('dataset_train_coherence_real',extension,input_size,augm=False)
-    # define data_loader with batch size 1
-    data_loader_coh = torch.utils.data.DataLoader(
-        dataset_coh, batch_size=1, shuffle=False, num_workers=0,
-        collate_fn=None)
     
-    model.eval()
-    outputs_coh=np.zeros((len(data_loader_coh),z_dim),dtype='float')
-    dataset_ids_coh=np.zeros((len(data_loader_coh),),dtype='float')
-    
-    # Test the train embedding
-    for i, (data, data_pos, data_neg,dset_id) in enumerate(data_loader_coh):
-        images, images_pos, images_neg = data, data_pos, data_neg
-        images, images_pos, images_neg = images.to(device), images_pos.to(device), images_neg.to(device)
-        _, outputs_aux, _, _, _, _, _, _, _, _  = model(images)
-        outputs_coh[i,:]=outputs_aux.detach().cpu().numpy()
-        dataset_ids_coh[i]=dset_id.cpu().numpy()
-        
-
-    dataset_ids_coh=dataset_ids_coh+n_train_datasets
-    # Graphical representation
-    if (z_dim==2):
-        sns_plot = sns.scatterplot(x=np.concatenate((outputs[:, 0],outputs_coh[:,0]),axis=0), y=np.concatenate((outputs[:, 1],outputs_coh[:,1]),axis=0), 
-                               hue=np.concatenate((dataset_ids.ravel(),dataset_ids_coh.ravel()),axis=0), style=np.concatenate((dataset_ids.ravel(),dataset_ids_coh.ravel()),axis=0),markers=['o' if i<n_train_datasets else ('X' if i<(2*n_train_datasets-1) else 's') for i in range(n_train_datasets+n_train_datasets+1)], s=POINT_SIZE, alpha=ALPHA, palette=palette_coh)
-    else:
-        print('Implement your favourite dimensionality reduction algorithm: TSNE, UMAP, ...')
-
-    plt.xlim([-6,9])
-    sns_plot.set_xlabel(r'$z_1$',fontsize=18)
-    sns_plot.set_ylabel(r'$z_2$',fontsize=18)
-    new_labels = []
-    for i in range(0, n_train_datasets):
-        # replace labels
-        new_labels.append(train_dataset_names[i])
-    for i in range(n_train_datasets):
-        # replace labels
-        new_labels.append(train_dataset_names[i])
-    new_labels.pop(1+n_train_datasets)
-    new_labels.append('VOC2012'+' ('+r'$D^{*na}_{13}$'+')')
-    new_labels.append('COCO'+' ('+r'$D^{*na}_{14}$'+')')
-    for t, l in zip(sns_plot.get_legend().texts, new_labels):  t.set_text(l)
-    plt.xticks(fontsize=16)
-    plt.yticks(fontsize=16)
-    plt.setp(sns_plot.get_legend().get_texts(), fontsize='16')
-    plt.tight_layout()
-    sns_plot.figure.savefig(os.path.join(RESULT_FOLDER, 'triplet_style_embedding_coh.png'),dpi=600)
-    plt.clf()
-
+    # Calculate the EQC
+    mean_matrix, min_matrix, max_matrix, EQC = calculate_distances(outputs,dataset_ids.ravel())
+    EQC_full=np.mean(np.max(EQC*np.triu(np.ones((n_train_datasets,n_train_datasets),dtype='float'),k=0),axis=0))
+    print('The quality criterion for the AE embedding is '+str(EQC_full))
