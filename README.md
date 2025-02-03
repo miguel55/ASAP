@@ -1,12 +1,12 @@
 # ASAP
 
 ## Description
-This repository contains the code and documentation to implement the system for selection of pre-trained datasets in the biomedical domain described in the paper (NOT AVAILABLE YET):
+This repository contains the code and documentation to implement the system for selection of pre-trained datasets in the biomedical domain described in the paper:
 
 ```
 ASAP: an Automated Style-Aware Selection of Pre-training Datasets in 2D Biomedical Imaging
 Miguel Molina-Moreno, Marcel P. Schilling, Markus Reischl and Ralf Mikut
-IEEE Transactions on Medical Imaging (submitted 2023)
+IEEE Access (submitted 2023)
 ```
 
 This code is based on the implementation by [Julian Stastny](https://github.com/julianstastny/VAE-ResNet18-PyTorch/blob/master/model.py) et al.
@@ -23,14 +23,13 @@ If you find ASAP useful in your research, please consider citing:
 	@ARTICLE{asap,
 		author = {ASAP: an Automated Style-Aware Selection of Pre-training Datasets in 2D Biomedical Imaging},
 		title = {Miguel Molina-Moreno, Marcel P. Schilling, Markus Reischl and Ralf Mikut},
-		journal = {IEEE Transactions on Medical Imaging},
-		year = {2023},
+		journal = {IEEE Access},
+		year = {2025},
 		volume={},
 		number={},
 		pages={},
-		doi={},
-		ISSN={1558-254X}
-	}
+		doi={}
+  }
 
 
 ## Installation
@@ -39,3 +38,9 @@ To start using ASAP in Python, download and unzip this repository
 ```
 git clone https://github.com/miguel55/ASAP
 ```
+
+The datasets and models are provided in the following Google Drive link:
+
+https://drive.google.com/file/d/11wC57NM-MRcA5UWNdaLZ3TTS6x5cSIbM/view?usp=sharing
+
+Please download and unzip this .zip file inside ASAP's main directory. 
