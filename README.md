@@ -6,7 +6,7 @@ This repository contains the code and documentation to implement the system for 
 ```
 ASAP: an Automated Style-Aware Selection of Pre-training Datasets in 2D Biomedical Imaging
 Miguel Molina-Moreno, Marcel P. Schilling, Markus Reischl and Ralf Mikut
-IEEE Access (submitted 2023)
+IEEE Access (submitted 2025)
 ```
 
 This code is based on the implementation by [Julian Stastny](https://github.com/julianstastny/VAE-ResNet18-PyTorch/blob/master/model.py) et al.
